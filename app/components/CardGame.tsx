@@ -122,9 +122,10 @@ const CardGame: React.FC = () => {
       maxMoves === moves
     ) {
       setShowModal(true);
-      const highScore = Math.min(bestScore, moves);
-      setBestScore(highScore);
-      localStorage.setItem("bestScore", highScore.toString());
+     // Calculate the best score
+     const newBestScore = Math.min(bestScore || Infinity, moves) * 2;
+     setBestScore(newBestScore);
+     localStorage.setItem("bestScore", newBestScore.toString());
     }
   };
 
