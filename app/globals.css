@@ -4,9 +4,8 @@
 
 :root {
   --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 255,255,255;
+  --background-start-rgb: 255, 255, 255;
 }
-
 
 body {
   color: rgb(var(--foreground-rgb));
@@ -15,13 +14,13 @@ body {
   background-size: cover;
 }
 
-div.line{
+div.line {
   background: url(../public/img-top-dotted-line.svg);
   background-repeat: no-repeat;
   background-size: cover;
-  margin-left: -160px;
+  margin-left: -580px;
+  margin-top: 50px
 }
-
 
 .bold {
   font-weight: 600;
@@ -34,77 +33,39 @@ div.line{
   height: 100%;
 }
 
-header {
-  position: relative;
-  width: 100%;
-  text-align: center;
-  margin-bottom: 8px;
-}
-
-header > div {
-  font-size: 15px;
-  width: 100%;
-  max-width: 324px;
-  text-align: center;
-  margin: 0 auto;
-}
-
-footer {
-  width: 100%;
-  max-width: 360px;
-  position: relative;
-  margin: 0 auto;
-  padding: 10px 4px;
-  margin-top: 10px;
-}
-
-footer .score {
-  justify-content: center;
-  display: flex;
-}
-
-footer .score div {
-  padding: 8px;
-}
-
-footer .restart {
-  display: flex;
-  justify-content: center;
-}
-
 .container {
-  padding: 4%;
-  padding-top: 6%;
+  padding: 2%;
+  padding-top: 8%;
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   grid-template-rows: repeat(2, 1fr);
   justify-items: center;
   align-items: stretch;
-  gap: 1rem;
-  width: 95%;
+  width: 60%;
   height: 95%;
 }
 
-@media (min-width: 768px) {
-  header > div {
-    font-size: 18px;
-  }
-
-  footer {
-    padding: 10px;
-  }
-
+@media (max-width: 640px) {
   .container {
-    gap: 2rem;
+    padding-top: 40%;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    justify-items: center;
+    align-items: stretch;
+    width: 90%;
+    height: 100%;
+    grid-gap: 3rem;
   }
-}
 
-@media (min-width: 1024px) {
-  header > div {
-    font-size: 20px;
+  div.line {
+    background: url(../public/img-top-dotted-line.svg);
+    background-repeat: no-repeat;
+    background-size: cover;
+    padding: 20px;
+    height: 40%;
+    width: 40%;
   }
 
-  footer {
-    padding: 10px 16px;
-  }
+  
 }

@@ -2,7 +2,7 @@ import React from "react";
 import Image from "next/image";
 
 import classnames from "classnames";
-import pokeball from "./images/pokeball.png";
+
 import "./card.css";
 
 interface CardProps {
@@ -29,8 +29,6 @@ const Card: React.FC<CardProps> = ({
     !isFlipped && !isDisabled && onClick(index);
   };
 
-  console.log(index, card.type)
-
   return (
     <div
       className={classnames("card", {
@@ -39,10 +37,14 @@ const Card: React.FC<CardProps> = ({
       })}
       onClick={handleClick}
     >
-      <div className="card-face card-font-face">
+      <div
+        className={classnames("card-face card-font-face", {
+          "border-2 border-green-500": isInactive,
+        })}
+      >
         <Image
           className=""
-          src="card.svg"
+          src={!isInactive ? "card.svg" : card.image}
           alt="Next.js Logo"
           width={280}
           height={37}
@@ -51,8 +53,8 @@ const Card: React.FC<CardProps> = ({
       <div className="card-face card-back-face">
         <Image
           className=""
-          src={card.image}
-          alt={`${card.image} image`}
+          src={!isFlipped ? '' : card.image}
+          alt={``}
           width={280}
           height={37}
         />

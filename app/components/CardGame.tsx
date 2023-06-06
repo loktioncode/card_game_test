@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import Card from "./card/Card";
 
+
 interface CardType {
   type: number;
   image: string;
@@ -28,6 +29,52 @@ const uniqueElementsArray: CardType[] = [
     image: "/images/clothes/card-5-turned.svg",
   },
 
+
+];
+
+const happyElements: CardType[] = [
+  {
+    type: 1,
+    image: "/images/clothes/card-1-complete.svg",
+  },
+  {
+    type: 2,
+    image: "/images/clothes/card-2-complete.svg",
+  },
+  {
+    type: 3,
+    image: "/images/clothes/card-3-complete.svg",
+  },
+  {
+    type: 4,
+    image: "/images/clothes/card-4-complete.svg",
+  },
+  {
+    type: 5,
+    image: "/images/clothes/card-5-complete.svg",
+  },
+  {
+    type:6,
+    image: "/images/clothes/card-6-complete.svg",
+  },
+  {
+    type: 2,
+    image: "/images/clothes/card-7-complete.svg",
+  },
+  {
+    type: 3,
+    image: "/images/clothes/card-8-complete.svg",
+  },
+  {
+    type: 4,
+    image: "/images/clothes/card-9-complete.svg",
+  },
+  {
+    type: 5,
+    image: "/images/clothes/card-5-complete.svg",
+  },
+
+  
 ];
 
 function shuffleCards(array: CardType[]) {
@@ -46,17 +93,17 @@ const CardGame: React.FC = () => {
   const [cards, setCards] = useState<CardType[]>(
     shuffleCards(uniqueElementsArray.concat(uniqueElementsArray))
   );
-  console.log(cards)
+
   const [openCards, setOpenCards] = useState<number[]>([]);
   const [clearedCards, setClearedCards] = useState<Record<string, boolean>>({});
   const [shouldDisableAllCards, setShouldDisableAllCards] = useState(false);
   const [moves, setMoves] = useState(0);
-  const [showModal, setShowModal] = useState(false);
-  const [bestScore, setBestScore] = useState(
-     10
-  );
-  const timeout = useRef<NodeJS.Timeout | null>(null);
+  const maxMoves = 12;
 
+  const [showModal, setShowModal] = useState(false);
+  const [bestScore, setBestScore] = useState(0);
+  const timeout = useRef<NodeJS.Timeout | null>(null);
+  let userScore = localStorage.getItem("bestScore");
   const disable = () => {
     setShouldDisableAllCards(true);
   };
@@ -65,20 +112,22 @@ const CardGame: React.FC = () => {
     setShouldDisableAllCards(false);
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const checkCompletion = () => {
-    if (Object.keys(clearedCards).length === uniqueElementsArray.length) {
+    if (Object.keys(clearedCards).length === uniqueElementsArray.length || maxMoves === moves) {
       setShowModal(true);
-      const highScore = Math.min(moves, bestScore);
+      const highScore = Math.min(moves , bestScore);
       setBestScore(highScore);
       localStorage.setItem("bestScore", highScore.toString());
     }
   };
 
-  const evaluate = () => {
+  const check_If_TypeIsSame = () => {
     const [first, second] = openCards;
     enable();
     if (cards[first].type === cards[second].type) {
       setClearedCards((prev) => ({ ...prev, [cards[first].type]: true }));
+      // localStorage.setItem("game", JSON.stringify(openCards));
       setOpenCards([]);
       return;
     }
@@ -89,7 +138,6 @@ const CardGame: React.FC = () => {
   };
 
   const handleCardClick = (index: number) => {
-  
     if (openCards.length === 1) {
       setOpenCards((prev) => [...prev, index]);
       setMoves((moves) => moves + 1);
@@ -103,7 +151,7 @@ const CardGame: React.FC = () => {
   useEffect(() => {
     let timeoutRef: NodeJS.Timeout | null = null;
     if (openCards.length === 2) {
-      timeoutRef = setTimeout(evaluate, 300);
+      timeoutRef = setTimeout(check_If_TypeIsSame, 300);
     }
     return () => {
       clearTimeout(timeoutRef as NodeJS.Timeout);
@@ -112,7 +160,14 @@ const CardGame: React.FC = () => {
 
   useEffect(() => {
     checkCompletion();
-  }, [clearedCards]);
+  }, [checkCompletion, clearedCards, moves]);
+
+  useEffect(() => {
+    let game = localStorage.getItem("game");
+
+
+  }, []);
+
 
   const checkIsFlipped = (index: number) => {
     return openCards.includes(index);
@@ -123,6 +178,7 @@ const CardGame: React.FC = () => {
   };
 
   const handleRestart = () => {
+
     setClearedCards({});
     setOpenCards([]);
     setShowModal(false);
@@ -133,62 +189,68 @@ const CardGame: React.FC = () => {
   };
 
   return (
-    <div className="App">
-  
-      <div className="container">
-        {cards.map((card, index) => (
-          <Card
-            key={index}
-            card={card}
-            index={index}
-            isDisabled={shouldDisableAllCards}
-            isInactive={checkIsInactive(card)}
-            isFlipped={checkIsFlipped(index)}
-            onClick={() => handleCardClick(index)}
-          />
-        ))}
+    <div>
+      
+      <div className="App">
+        <div className="container w-full h-full relative">
+          {cards.map((card, index) => (
+            <Card
+              key={index}
+              card={card}
+              index={index}
+              isDisabled={shouldDisableAllCards}
+              isInactive={checkIsInactive(card)}
+              isFlipped={checkIsFlipped(index)}
+              onClick={() => handleCardClick(index)}
+            />
+          ))}
+        </div>
+        <legend className="bg-white w-11/12 rounded-lg flex flex-col mt-[-20px]">
+          <div className="flex flex-col lg:flex-row items-center justify-around p-8">
+            <div>
+              <h4 className="text-4xl  font-bold w-full text-start">
+                Highest Score: {userScore ?? 0}
+              </h4>
+            </div>
+            <div className="flex flex-col">
+              <h4 className="text-4xl  font-bold w-full text-start">
+                {moves} moves
+              </h4>
+            </div>
+            <button
+              onClick={handleRestart}
+              className="bg-[#52B1B3] text-white font-bold p-6 rounded-2xl w-2/12"
+            >
+              Restart
+            </button>
+          </div>
+        </legend>
+        {showModal && (
+          <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center">
+            <div className="bg-white p-8 rounded shadow">
+              {maxMoves === moves ? <h2 className="text-xl font-bold mb-4">
+                Oops! you are out of moves!
+              </h2>: <h2 className="text-2xl font-bold mb-4">
+                Hurray!!! You completed the challenge
+              </h2>}
+              <p className="text-lg mb-4">
+                You completed the game in {moves} moves. Your best score is{" "}
+                {bestScore} 
+              </p>
+              <div className="text-center">
+                <button
+                  onClick={handleRestart}
+                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                >
+                  Restart
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
-      <footer>
-        <div className="score">
-          <div className="moves">
-            <span className="bold">Moves:</span> {moves}
-          </div>
-          {/* {localStorage.getItem("bestScore") && (
-            <div className="high-score">
-              <span className="bold">Best Score:</span> {bestScore}
-            </div>
-          )} */}
-        </div>
-        <div className="restart">
-          <button
-            onClick={handleRestart}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          >
-            Restart
-          </button>
-        </div>
-      </footer>
-      {showModal && (
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center">
-          <div className="bg-white p-8 rounded shadow">
-            <h2 className="text-xl font-bold mb-4">Hurray!!! You completed the challenge</h2>
-            <p className="text-sm mb-4">
-              You completed the game in {moves} moves. Your best score is {bestScore} moves.
-            </p>
-            <div className="text-center">
-              <button
-                onClick={handleRestart}
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-              >
-                Restart
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
 
 export default CardGame;
-
