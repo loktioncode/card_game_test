@@ -4,17 +4,10 @@
 
 :root {
   --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
+  --background-start-rgb: 255,255,255;
   --background-end-rgb: 255, 255, 255;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
-}
 
 body {
   color: rgb(var(--foreground-rgb));
@@ -24,4 +17,92 @@ body {
       rgb(var(--background-end-rgb))
     )
     rgb(var(--background-start-rgb));
+}
+
+
+.bold {
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.App {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+header {
+  position: relative;
+  width: 100%;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+header > div {
+  font-size: 15px;
+  width: 100%;
+  max-width: 324px;
+  text-align: center;
+  margin: 0 auto;
+}
+
+footer {
+  width: 100%;
+  max-width: 360px;
+  position: relative;
+  margin: 0 auto;
+  padding: 10px 4px;
+  margin-top: 10px;
+}
+
+footer .score {
+  justify-content: center;
+  display: flex;
+}
+
+footer .score div {
+  padding: 8px;
+}
+
+footer .restart {
+  display: flex;
+  justify-content: center;
+}
+
+.container {
+  padding: 12px;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  justify-items: center;
+  align-items: stretch;
+  gap: 1rem;
+  width: 100%;
+  height: 100%;
+  perspective: 100%;
+
+}
+
+@media (min-width: 768px) {
+  header > div {
+    font-size: 18px;
+  }
+
+  footer {
+    padding: 10px;
+  }
+
+  .container {
+    gap: 2rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  header > div {
+    font-size: 20px;
+  }
+
+  footer {
+    padding: 10px 16px;
+  }
 }
