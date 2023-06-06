@@ -13,7 +13,7 @@ export default function Home() {
       </div>
 
       <div className="flex flex-col justify-between items-center w-4/12">
-        <div className="line  rotate-60 pl-10 ">
+        <div className="line rotate-60 pl-10 pb-10">
           <h1 className={classNames("text-3xl font_nanum py-14 ml-28 float-right w-5/12 ", nanum_Pen_Script.className)} >
             {" "}
             Mix & match the tiles to reveal a surprise!
