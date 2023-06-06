@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import Card from "./card/Card";
 
-
 interface CardType {
   type: number;
   image: string;
@@ -28,53 +27,49 @@ const uniqueElementsArray: CardType[] = [
     type: 5,
     image: "/images/clothes/card-5-turned.svg",
   },
-
-
 ];
 
 const happyElements: CardType[] = [
   {
     type: 1,
-    image: "/images/clothes/card-1-complete.svg",
+    image: "/images/happy/card-1-complete.svg",
   },
   {
     type: 2,
-    image: "/images/clothes/card-2-complete.svg",
+    image: "/images/happy/card-2-complete.svg",
   },
   {
     type: 3,
-    image: "/images/clothes/card-3-complete.svg",
+    image: "/images/happy/card-3-complete.svg",
   },
   {
     type: 4,
-    image: "/images/clothes/card-4-complete.svg",
+    image: "/images/happy/card-4-complete.svg",
   },
   {
     type: 5,
-    image: "/images/clothes/card-5-complete.svg",
+    image: "/images/happy/card-5-complete.svg",
   },
   {
-    type:6,
-    image: "/images/clothes/card-6-complete.svg",
+    type: 1,
+    image: "/images/happy/card-6-complete.svg",
   },
   {
     type: 2,
-    image: "/images/clothes/card-7-complete.svg",
+    image: "/images/happy/card-7-complete.svg",
   },
   {
     type: 3,
-    image: "/images/clothes/card-8-complete.svg",
+    image: "/images/happy/card-8-complete.svg",
   },
   {
     type: 4,
-    image: "/images/clothes/card-9-complete.svg",
+    image: "/images/happy/card-9-complete.svg",
   },
   {
     type: 5,
-    image: "/images/clothes/card-5-complete.svg",
+    image: "/images/happy/card-10-complete.svg",
   },
-
-  
 ];
 
 function shuffleCards(array: CardType[]) {
@@ -98,12 +93,11 @@ const CardGame: React.FC = () => {
   const [clearedCards, setClearedCards] = useState<Record<string, boolean>>({});
   const [shouldDisableAllCards, setShouldDisableAllCards] = useState(false);
   const [moves, setMoves] = useState(0);
-  const maxMoves = 12;
+  const maxMoves = 14;
 
   const [showModal, setShowModal] = useState(false);
   const [bestScore, setBestScore] = useState(0);
   const timeout = useRef<NodeJS.Timeout | null>(null);
-  let userScore = localStorage.getItem("bestScore");
   const disable = () => {
     setShouldDisableAllCards(true);
   };
@@ -111,12 +105,24 @@ const CardGame: React.FC = () => {
   const enable = () => {
     setShouldDisableAllCards(false);
   };
+  const saveGameState = (state: any) => {
+    localStorage.setItem("gameState", JSON.stringify(state));
+  };
+
+  const loadGameState = () => {
+    const savedState = localStorage.getItem("gameState");
+    return savedState ? JSON.parse(savedState) : null;
+  };
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const checkCompletion = () => {
-    if (Object.keys(clearedCards).length === uniqueElementsArray.length || maxMoves === moves) {
+    if (
+      (clearedCards &&
+        Object.keys(clearedCards).length === uniqueElementsArray.length) ||
+      maxMoves === moves
+    ) {
       setShowModal(true);
-      const highScore = Math.min(moves , bestScore);
+      const highScore = Math.min(bestScore, moves);
       setBestScore(highScore);
       localStorage.setItem("bestScore", highScore.toString());
     }
@@ -124,14 +130,21 @@ const CardGame: React.FC = () => {
 
   const check_If_TypeIsSame = () => {
     const [first, second] = openCards;
+
     enable();
     if (cards[first].type === cards[second].type) {
-      setClearedCards((prev) => ({ ...prev, [cards[first].type]: true }));
-      // localStorage.setItem("game", JSON.stringify(openCards));
+      const typeString = cards[first].type.toString();
+      setClearedCards((prev) => ({ ...prev, [typeString]: true }));
       setOpenCards([]);
+
+      // Save the game state
+      saveGameState({
+        openCards: [],
+        clearedCards: { ...clearedCards, [typeString]: true },
+        moves,
+      });
       return;
     }
-    // This is to flip the cards back after 500ms duration
     timeout.current = setTimeout(() => {
       setOpenCards([]);
     }, 500);
@@ -142,6 +155,15 @@ const CardGame: React.FC = () => {
       setOpenCards((prev) => [...prev, index]);
       setMoves((moves) => moves + 1);
       disable();
+      let userScore = localStorage.getItem("bestScore");
+
+      // Save the game state
+      saveGameState({
+        openCards: [...openCards, index],
+        clearedCards: { ...clearedCards },
+        moves: moves + 1,
+        userScore,
+      });
     } else {
       clearTimeout(timeout.current as NodeJS.Timeout);
       setOpenCards([index]);
@@ -162,37 +184,58 @@ const CardGame: React.FC = () => {
     checkCompletion();
   }, [checkCompletion, clearedCards, moves]);
 
-  useEffect(() => {
-    let game = localStorage.getItem("game");
-
-
-  }, []);
-
-
   const checkIsFlipped = (index: number) => {
     return openCards.includes(index);
   };
 
   const checkIsInactive = (card: CardType) => {
-    return Boolean(clearedCards[card.type]);
+    const typeString = card.type.toString();
+    return Boolean(clearedCards && clearedCards[typeString]);
   };
 
   const handleRestart = () => {
-
     setClearedCards({});
     setOpenCards([]);
     setShowModal(false);
     setMoves(0);
     setShouldDisableAllCards(false);
-    // set a shuffled deck of cards
-    setCards(shuffleCards(uniqueElementsArray.concat(uniqueElementsArray)));
+
+    // Shuffle uniqueElementsArray and happyElements
+    const shuffledUniqueElements =
+      shuffleCards(uniqueElementsArray).concat(uniqueElementsArray);
+
+    // Generate a random number (0 or 1) to determine which set of elements to use alone
+    const randomPick = Math.floor(Math.random() * 3);
+
+    let shuffledCards;
+    if (randomPick === 0) {
+      // Use shuffledUniqueElements alone
+      shuffledCards = shuffledUniqueElements;
+    } else {
+      // Use shuffledHappyElements alone
+      shuffledCards = happyElements;
+    }
+    // Set the shuffled cards as the new state
+    setCards(shuffledCards);
+
+    // Clear the saved game state
+    localStorage.removeItem("gameState");
   };
+
+  useEffect(() => {
+    const savedState = loadGameState();
+    if (savedState) {
+      setOpenCards(savedState.openCards);
+      setClearedCards(savedState.clearedCards);
+      setMoves(savedState.moves);
+      setBestScore(savedState.bestScore);
+    }
+  }, []);
 
   return (
     <div>
-      
       <div className="App">
-        <div className="container w-full h-full relative">
+        <div className="container">
           {cards.map((card, index) => (
             <Card
               key={index}
@@ -209,7 +252,7 @@ const CardGame: React.FC = () => {
           <div className="flex flex-col lg:flex-row items-center justify-around p-8">
             <div>
               <h4 className="text-4xl  font-bold w-full text-start">
-                Highest Score: {userScore ?? 0}
+                Highest Score: {bestScore}
               </h4>
             </div>
             <div className="flex flex-col">
@@ -228,19 +271,23 @@ const CardGame: React.FC = () => {
         {showModal && (
           <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center">
             <div className="bg-white p-8 rounded shadow">
-              {maxMoves === moves ? <h2 className="text-xl font-bold mb-4">
-                Oops! you are out of moves!
-              </h2>: <h2 className="text-2xl font-bold mb-4">
-                Hurray!!! You completed the challenge
-              </h2>}
+              {maxMoves === moves ? (
+                <h2 className="text-xl font-bold mb-4">
+                  Oops! you are out of moves!
+                </h2>
+              ) : (
+                <h2 className="text-2xl font-bold mb-4">
+                  Hurray!!! You completed the challenge
+                </h2>
+              )}
               <p className="text-lg mb-4">
                 You completed the game in {moves} moves. Your best score is{" "}
-                {bestScore} 
+                {bestScore}
               </p>
               <div className="text-center">
                 <button
                   onClick={handleRestart}
-                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                  className="bg-[#52B1B3] text-white font-bold py-2 px-4 rounded"
                 >
                   Restart
                 </button>
