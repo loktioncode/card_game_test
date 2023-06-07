@@ -108,6 +108,20 @@ const CardGame: React.FC = () => {
   const saveGameState = (state: any) => {
     localStorage.setItem("gameState", JSON.stringify(state));
   };
+  
+  function calculateScore(numMoves) {
+  // Define the maximum score and the penalty per move
+  const maxScore = 100;
+  const penaltyPerMove = 10;
+
+  // Calculate the score
+  let score = maxScore - numMoves * penaltyPerMove;
+
+  // Ensure the score doesn't go below zero
+  score = Math.max(score, 0);
+
+  return score;
+}
 
   const loadGameState = () => {
     const savedState = localStorage.getItem("gameState");
@@ -123,7 +137,7 @@ const CardGame: React.FC = () => {
     ) {
       setShowModal(true);
      // Calculate the best score
-     const newBestScore = Math.min(bestScore || Infinity, moves) * 2;
+     const newBestScore = calculateScore(moves);
      setBestScore(newBestScore);
      localStorage.setItem("bestScore", newBestScore.toString());
     }
