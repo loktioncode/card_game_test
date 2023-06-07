@@ -109,7 +109,7 @@ const CardGame: React.FC = () => {
     localStorage.setItem("gameState", JSON.stringify(state));
   };
   
-  function calculateScore(numMoves) {
+  function calculateScore(numMoves: number) {
   // Define the maximum score and the penalty per move
   const maxScore = 100;
   const penaltyPerMove = 10;
